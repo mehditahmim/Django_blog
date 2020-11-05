@@ -10,6 +10,9 @@ User = get_user_model()
 class Author(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
+    def __str__(self):
+        return self.user.username
+
 
 class Posts(models.Model):
     author = models.ForeignKey(Author, on_delete=models.CASCADE)
