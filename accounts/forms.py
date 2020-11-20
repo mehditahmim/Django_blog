@@ -6,9 +6,10 @@ from django.contrib.auth import login, authenticate
 
 
 class SignupForm(UserCreationForm):
+
     email = forms.EmailField()
     fullName = forms.CharField(max_length=30)
-
+   
     class Meta:
         model = User
         fields = ['fullName', 'username', 'email',

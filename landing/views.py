@@ -8,9 +8,8 @@ from django.urls import reverse
 
 
 def index(request):
-    posts = Posts.objects.all()
+    posts = Posts.objects.all().order_by('-timeStamp')
     paginator = Paginator(posts, 2)
-
     page = request.GET.get('page')
 
     try:
@@ -21,6 +20,8 @@ def index(request):
 
     except EmptyPage:
         paginator_query_set = paginator.page(paginator.num_pages)
+
     num_pages = paginator.num_pages
     num_pages = [n for n in range(1, num_pages+1)]
-    return render(request, 'index.html', {'paginator_query_set': paginator_query_set, 'num_pages': num_pages})
+    user = request.user
+    return render(request, 'index.html', {'paginator_query_set': paginator_query_set, 'num_pages': num_pages, 'user': user})

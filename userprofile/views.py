@@ -5,7 +5,6 @@ from django.contrib.auth.models import User
 
 
 def profileView(request, username):
-
     user = get_object_or_404(User, username=username)
     author = Author.objects.get(user=user)
     posts = Posts.objects.filter(author=author)
@@ -14,3 +13,9 @@ def profileView(request, username):
     return render(request, 'userprofile.html', context)
 
 # Create your views here.
+
+
+def postView(request, username, title):
+    post = Posts.objects.get(title=title)
+    #post = get_object_or_404(Posts, title=title)
+    return render(request, 'post.html', {'post': post})
