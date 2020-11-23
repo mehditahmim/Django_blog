@@ -65,8 +65,10 @@
             <a href="{% url 'userprofile:profileView' post.author %}"> {{post.author}} </a>
             on {{ post.timeStamp}}
           </p>
-           
-            <applause-button style="height:32px; width:32px" color="blue" disabled="true"/>   
+            
+            <applause-button style="height:32px; width:32px" name='like-btn' color="green" />
+          
+
             <hr>                    
           </div> 
           {% endfor %}    
@@ -115,7 +117,7 @@
 
 
   </div>
-  
+ 
 <!-- Footer -->
 {%include 'footer.html'%}
 

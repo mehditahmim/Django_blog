@@ -5,4 +5,5 @@ app_name = 'posts'
 urlpatterns = [
     path('<int:pk>-<slug:slug>', views.postView, name='postView'),
     path('create/', views.createPost, name='createPost'),
+    path('', views.likePosts, name='likeView'),
 ]

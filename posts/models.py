@@ -22,7 +22,7 @@ class Posts(models.Model):
     timeStamp = models.DateTimeField(auto_now_add=True)
     thumbnail = models.ImageField()
     comment = models.IntegerField(default=0)
-    likes = models.IntegerField(default=0)
+    likes = models.ManyToManyField(User)
 
     def __str__(self):
         return self.title
@@ -35,9 +35,13 @@ class Posts(models.Model):
                       'pk': self.pk, 'slug': self.getSlug()})
         return url
 
+    @property
+    def getLikesCount(self):
+        return self.likes.count()
+
 
 class Comments(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     post = models.ForeignKey(Posts, on_delete=models.CASCADE)
     text = models.TextField()
     timeStamp = models.DateTimeField(auto_now_add=True)
