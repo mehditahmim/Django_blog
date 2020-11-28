@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, HttpResponseRedirect, HttpResponse
-from .models import Posts
+from .models import Posts, Comments
 from .forms import postForm
 from django.contrib import messages
 from posts.models import Author
@@ -9,14 +9,14 @@ from django.utils.text import slugify
 from django.db.models import F
 import json
 from django.views.decorators.csrf import csrf_protect
+from django.template.loader import render_to_string
 # Create your views here.
 
 
 def postView(request, slug, pk):
     post = get_object_or_404(Posts, pk=pk)
-    if post.likes.filter(id = request.user.id):
-        userLiked = True
-    return render(request, 'post.html', {'post': post,'userLiked':userLiked})
+    comments = post.comments
+    return render(request, 'post.html', {'post': post, 'comments': comments})
 
 
 def createPost(request):
@@ -60,4 +60,21 @@ def likePosts(request):
             ctx = {"likes_count": like_count,
                    "liked": liked, "post_id": post_id,
                    "like_count": like_count}
+            return HttpResponse(json.dumps(ctx), content_type='application/json')
+
+
+@csrf_protect
+def comments(request):
+    if request.method == "POST":
+        if request.POST.get("operation") == "comment_submit" and request.is_ajax():
+            post_num = request.POST.get("content_id", None)
+            post = get_object_or_404(Posts, pk=post_num)
+            comment = Comments()
+            comment.user = request.user
+            comment.post = post
+            comment_text = request.POST.get("cmnt_text", None)
+            comment.text = comment_text
+            comment.save()
+            #html = render_to_string('post.html', {'objects': objects_list})
+            ctx = {'comment_text': comment_text}
             return HttpResponse(json.dumps(ctx), content_type='application/json')

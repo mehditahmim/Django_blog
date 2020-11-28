@@ -47,4 +47,7 @@ class Comments(models.Model):
     timeStamp = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return text
+        return self.text
+
+    def getCommentCount(self):
+        return self.text.count()

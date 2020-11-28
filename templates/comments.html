@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load static%}
+{% block content %}
+            
+    <div class="container">
+        <h2>Leave a Comment</h2>
+        
+            <textarea id="txtArea" placeholder='Add Your Comment' ></textarea>
+                <div class="btn" id="comment-button" >
+                  <!-- <button class="btn btn-secondary comment-post" name="{{post.id}}" id="comment-btn" value="comment">Comment</button> -->
+                 <input class="commentText" type="submit" value='Comment' name="{{post.id}}"  id="comment-submit" >  
+                <button id='clear'>Cancel</button>
+              </div>
+           
+        
+        <span id="message"></span>
+
+        <!-- Posting Comments -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script type="text/javascript" >
+                     
+                 $("#comment-submit").click(function(){ 
+                    // console.log('works!');
+                  var txt = $("#txtArea").val();    
+                // var ft =  $(this).attr('name');
+                
+                // alert('hello');
+                  $.ajax({
+                  type: "POST",
+                  url: "{% url 'posts:comments' %}",
+                  data: {'content_id': $(this).attr('name'),'cmnt_text':txt,'operation':'comment_submit','csrfmiddlewaretoken': '{{ csrf_token }}'},
+                  dataType: "json",
+                  success: function(response) {
+                       $('#message').html(response.comment_text);
+                       console.log('dw');
+                    },
+                  error: function(response, e) {
+                  alert(e); //throw actual error, just for debugging purpose
+                  alert('Oops! something went worng..'); // alert user that something goes wrong
+             }
+      
+            });
+    
+      })   
+        </script>
+
+        <!-- comment system -->
+  <div class="comments-container">
+    <h1>Comments <a href="http://creaticode.com">creaticode.com</a></h1>
+    {% if comments %}
+   {% for comment in comments %}
+    <ul id="comments-list" class="comments-list">
+      <li>
+        <div class="comment-main-level">
+          <!-- Avatar -->
+          <div class="comment-avatar"><img src="http://i9.photobucket.com/albums/a88/creaticode/avatar_1_zps8e1c80cd.jpg" alt=""></div>
+          <!-- Contenedor del Comentario -->
+          <div class="comment-box">
+            <div class="comment-head">
+              <h6 class="comment-name by-author"><a href="http://creaticode.com/blog">comment.user.username</a></h6>
+              <span>comment.timeStamp</span>
+              <i class="fa fa-reply"></i>
+              <i class="fa fa-heart"></i>
+            </div>
+            <div class="comment-content">
+              {{comment.text}}
+            </div>
+          </div>
+        </div>
+
+      </li>
+      {%endif%}
+      {% endfor %}
+      
+    </ul>
+  </div>
+    </div>
+
+
+
+{%endblock%}
