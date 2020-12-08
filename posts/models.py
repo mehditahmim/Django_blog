@@ -22,7 +22,7 @@ class Posts(models.Model):
     timeStamp = models.DateTimeField(auto_now_add=True)
     thumbnail = models.ImageField()
     comment = models.IntegerField(default=0)
-    likes = models.ManyToManyField(User)
+    likes = models.ManyToManyField(User, blank=True)
 
     def __str__(self):
         return self.title
@@ -48,6 +48,3 @@ class Comments(models.Model):
 
     def __str__(self):
         return self.text
-
-    def getCommentCount(self):
-        return self.text.count()

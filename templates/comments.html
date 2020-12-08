@@ -2,63 +2,48 @@
 {% load static%}
 {% block content %}
             
-    <div class="container">
+    <!-- The comment box -->
+      <div class="comments-container">
+      
         <h2>Leave a Comment</h2>
-        
+
             <textarea id="txtArea" placeholder='Add Your Comment' ></textarea>
                 <div class="btn" id="comment-button" >
-                  <!-- <button class="btn btn-secondary comment-post" name="{{post.id}}" id="comment-btn" value="comment">Comment</button> -->
+                <!-- <button class="btn btn-secondary comment-post" name="{{post.id}}" id="comment-btn" value="comment">Comment</button> -->
                  <input class="commentText" type="submit" value='Comment' name="{{post.id}}"  id="comment-submit" >  
                 <button id='clear'>Cancel</button>
-              </div>
-           
-        
-        <span id="message"></span>
-
-        <!-- Posting Comments -->
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-        <script type="text/javascript" >
-                     
-                 $("#comment-submit").click(function(){ 
-                    // console.log('works!');
-                  var txt = $("#txtArea").val();    
-                // var ft =  $(this).attr('name');
-                
-                // alert('hello');
-                  $.ajax({
-                  type: "POST",
-                  url: "{% url 'posts:comments' %}",
-                  data: {'content_id': $(this).attr('name'),'cmnt_text':txt,'operation':'comment_submit','csrfmiddlewaretoken': '{{ csrf_token }}'},
-                  dataType: "json",
-                  success: function(response) {
-                       $('#message').html(response.comment_text);
-                       console.log('dw');
-                    },
-                  error: function(response, e) {
-                  alert(e); //throw actual error, just for debugging purpose
-                  alert('Oops! something went worng..'); // alert user that something goes wrong
-             }
+              </div>  
       
-            });
-    
-      })   
-        </script>
+            </div>
+     
+        <!-- <a href="{%url 'accounts:login' %}">Please sign in to comment.</a>     -->
+        
+             <!-- comment system -->
+  <div class="comments-container" id="comments">
+    <div class="comment-details">
+      
+    <h1 id="comment_number">
+      {%ifequal comments_count 0%}
+      No comments yet!
 
-        <!-- comment system -->
-  <div class="comments-container">
-    <h1>Comments <a href="http://creaticode.com">creaticode.com</a></h1>
-    {% if comments %}
-   {% for comment in comments %}
-    <ul id="comments-list" class="comments-list">
-      <li>
+      {%else%}
+
+      {{comments_count}} Comment{{comments_count|pluralize }} </h1><a href="http://creaticode.com"></a></h1>
+    {%endifequal%}
+  </div>
+    <ul class="comments-list">
+
+      <li id="sublist">
+        {%if comments%}
+        {% for comment in comments %}
         <div class="comment-main-level">
           <!-- Avatar -->
           <div class="comment-avatar"><img src="http://i9.photobucket.com/albums/a88/creaticode/avatar_1_zps8e1c80cd.jpg" alt=""></div>
           <!-- Contenedor del Comentario -->
           <div class="comment-box">
             <div class="comment-head">
-              <h6 class="comment-name by-author"><a href="http://creaticode.com/blog">comment.user.username</a></h6>
-              <span>comment.timeStamp</span>
+              <h6 class="comment-name by-author" id="author"><a href="http://creaticode.com/blog">{{comment.user.username}}</a></h6>
+              <span id = 'time'>{{comment.timeStamp}}</span>
               <i class="fa fa-reply"></i>
               <i class="fa fa-heart"></i>
             </div>
@@ -67,14 +52,91 @@
             </div>
           </div>
         </div>
-
+        
       </li>
-      {%endif%}
+      
       {% endfor %}
+      {%endif%}
+  
+      
       
     </ul>
   </div>
     </div>
+        <!-- Posting Comments -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script type="text/javascript" >
+                  
+                 $("#comment-submit").click(function(){ 
+                    // console.log('works!');
+                     
+                // var ft =  $(this).attr('name');
+                var txt = $("#txtArea").val(); 
+                // alert('hello');
+                if (txt != ''){ insertComment(txt);
+                  
+                
+                }
+
+    
+      })
+      function insertComment(txt){
+        $.ajax({
+                  type: "POST",
+                  url: "{% url 'posts:comments' %}",
+                  data: {'content_id': $('.commentText').attr('name'),'cmnt_text':txt,'operation':'comment_submit','csrfmiddlewaretoken': '{{ csrf_token }}'},
+                  dataType: "json",
+                  success: function(response) {
+                    console.log('works!');
+                    var txt = $("#txtArea").val(''); 
+                    //rendering the comment after user submits the comment
+                    $('<div class="comments-container">\
+                        <ul class="comments-list">\
+                        <li id="sublist">\
+                        <div class="comment-main-level"> \
+                          <div class="comment-avatar"><img src="http://i9.photobucket.com/albums/a88/creaticode/avatar_1_zps8e1c80cd.jpg" alt=""></div>\
+                            <div class="comment-box">\
+                              <div class="comment-head">\
+                                <h6 class="comment-name by-author" id="author">'+ response.user_name+'<a href="http://creaticode.com/blog"></a></h6>\
+                                  <span id = "time"> Just now </span>\
+                                    <i class="fa fa-reply"></i>\
+                                    <i class="fa fa-heart"></i>\
+                              </div>\
+                                <div class="comment-content">'
+                                     + response.comment_text +
+                                  '</div>\
+                                  </div>\
+                                  </div>'
+                        ).insertBefore('#sublist');
+                      
+                        changeCommentNumber(response.comment_count); //this renders the new comment numbers after adding a comment.
+                        
+                    },
+                  error: function(response, e) {
+                  alert(e); //throw actual error, just for debugging purpose
+                  alert('Oops! something went worng..'); // alert user that something goes wrong
+             }
+      
+            });
+      } 
+
+      function changeCommentNumber(numberOfComments){
+        var comment = (numberOfComments > 1) ? "Comments" : "Comment";
+        if(numberOfComments == 1) {
+          $('#comment_number').html(numberOfComments+' '+comment);
+        }
+        else{
+          $('#comment_number').html(numberOfComments+' '+comment);
+          console.log(numberOfComments);
+          console.log('hi');
+        }
+        
+        
+        
+      }  
+        </script>
+
+  
 
 
 

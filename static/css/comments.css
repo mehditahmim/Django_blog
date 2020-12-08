@@ -17,7 +17,7 @@ ul {
 
 body {
   font-family: "Roboto", Arial, Helvetica, Sans-serif, Verdana;
-  background: #dee1e3;
+  /* background: #dee1e3; */
 }
 
 /** ====================
@@ -51,7 +51,7 @@ body {
   content: "";
   width: 2px;
   height: 100%;
-  background: #c7cacb;
+  /* background: #c7cacb; */
   position: absolute;
   left: 32px;
   top: 0;
@@ -60,29 +60,15 @@ body {
 .comments-list:after {
   content: "";
   position: absolute;
-  background: #c7cacb;
+  /* background: #c7cacb; */
   bottom: 0;
   left: 27px;
   width: 7px;
   height: 7px;
-  border: 3px solid #dee1e3;
+  /* border: 3px solid #dee1e3; */
   -webkit-border-radius: 50%;
   -moz-border-radius: 50%;
   border-radius: 50%;
-}
-
-.reply-list:before,
-.reply-list:after {
-  display: none;
-}
-.reply-list li:before {
-  content: "";
-  width: 60px;
-  height: 2px;
-  background: #c7cacb;
-  position: absolute;
-  top: 25px;
-  left: -55px;
 }
 
 .comments-list li {

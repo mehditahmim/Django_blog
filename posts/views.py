@@ -1,4 +1,5 @@
 from django.shortcuts import render, get_object_or_404, HttpResponseRedirect, HttpResponse
+from django.http import JsonResponse
 from .models import Posts, Comments
 from .forms import postForm
 from django.contrib import messages
@@ -10,13 +11,17 @@ from django.db.models import F
 import json
 from django.views.decorators.csrf import csrf_protect
 from django.template.loader import render_to_string
+import datetime
+from django.core.serializers import serialize
+from django.contrib.auth.decorators import login_required
 # Create your views here.
 
 
 def postView(request, slug, pk):
     post = get_object_or_404(Posts, pk=pk)
-    comments = post.comments
-    return render(request, 'post.html', {'post': post, 'comments': comments})
+    comments = post.comments_set.all()
+    comments_count = comments.count()
+    return render(request, 'post.html', {'post': post, 'comments': comments, 'comments_count': comments_count})
 
 
 def createPost(request):
@@ -64,17 +69,29 @@ def likePosts(request):
 
 
 @csrf_protect
+@login_required()
 def comments(request):
     if request.method == "POST":
         if request.POST.get("operation") == "comment_submit" and request.is_ajax():
             post_num = request.POST.get("content_id", None)
             post = get_object_or_404(Posts, pk=post_num)
+
             comment = Comments()
+
             comment.user = request.user
             comment.post = post
             comment_text = request.POST.get("cmnt_text", None)
             comment.text = comment_text
             comment.save()
+            comment_user_name = request.user
             #html = render_to_string('post.html', {'objects': objects_list})
-            ctx = {'comment_text': comment_text}
+            # comment_time = datetime.datetime.now()
+            comment_count = Comments.objects.filter(post=post).count()
+            comments = Comments.objects.all()
+            user_name = request.user.username
+            ctx = {'comment_text': comment_text,
+                   'user_name': user_name,
+                   'comment_count': comment_count
+                   }
+
             return HttpResponse(json.dumps(ctx), content_type='application/json')
